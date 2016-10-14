@@ -22,8 +22,8 @@ public class Uploader {
 		final Path localEncodedPath = Paths.get(args[0]);
 		final Path acdEncodedPath = Paths.get(args[1]);
 
-		if (!Files.exists(localEncodedPath) || !Files.exists(acdEncodedPath)) {
-			System.out.println("Input paths doesn't exist");
+		if (!Files.exists(localEncodedPath)) {
+			System.out.println("Input path doesn't exist");
 			System.exit(0);
 		}
 
@@ -33,7 +33,8 @@ public class Uploader {
 			Files.walkFileTree(localEncodedPath, new SimpleFileVisitor<Path>() {
 
 				@Override
-				public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+				public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+						throws IOException {
 					if (!dir.equals(localEncodedPath) && !StringUtils.startsWith(dir.getFileName().toString(), ".")) {
 						System.out.println("Process directory " + dir);
 						Path toCreate = acdEncodedPath.resolve(localEncodedPath.relativize(dir));
@@ -49,9 +50,8 @@ public class Uploader {
 							outputStream = new ByteArrayOutputStream();
 							PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
 							executor.setStreamHandler(streamHandler);
-							long start = Calendar.getInstance().getTimeInMillis();
 							executor.execute(cmdLine);
-							System.out.println(outputStream.toString() + "(" + (Calendar.getInstance().getTimeInMillis() - start) / 1000 + "sec)");
+							System.out.println(outputStream.toString());
 						} catch (Exception e) {
 							e.printStackTrace();
 						} finally {
@@ -78,8 +78,10 @@ public class Uploader {
 						outputStream = new ByteArrayOutputStream();
 						PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
 						executor.setStreamHandler(streamHandler);
+						long start = Calendar.getInstance().getTimeInMillis();
 						executor.execute(cmdLine);
-						System.out.println(outputStream.toString());
+						System.out.println(outputStream.toString() + "("
+								+ (Calendar.getInstance().getTimeInMillis() - start) / 1000 + "sec)");
 						Files.delete(file);
 					} catch (Exception e) {
 						e.printStackTrace();
