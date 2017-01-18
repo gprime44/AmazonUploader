@@ -37,9 +37,9 @@ public class Uploader {
 					if (!dir.equals(localEncodedPath) && !StringUtils.startsWith(dir.getFileName().toString(), ".")) {
 						StringBuilder log = new StringBuilder();
 						for (int i = 0; i < dir.getNameCount(); i++) {
-							log.append(" ... ");
+							log.append(" ...");
 						}
-						System.out.println("Process directory " + log.toString() + dir.getFileName().toString());
+						System.out.println(" Process directory " + log.toString() + dir.getFileName().toString());
 
 						Path toCreate = acdEncodedPath.resolve(localEncodedPath.relativize(dir));
 
@@ -49,7 +49,7 @@ public class Uploader {
 
 						ByteArrayOutputStream outputStream = null;
 						try {
-							System.out.println(log.toString() + "Create directory " + toCreate.toAbsolutePath().toString());
+							System.out.println(log.toString() + " Create directory " + toCreate.toAbsolutePath().toString());
 							DefaultExecutor executor = new DefaultExecutor();
 							outputStream = new ByteArrayOutputStream();
 							PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
@@ -69,9 +69,9 @@ public class Uploader {
 				public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
 					StringBuilder log = new StringBuilder();
 					for (int i = 0; i < file.getNameCount(); i++) {
-						log.append(" ... ");
+						log.append(" ...");
 					}
-					System.out.println(log.toString() + "Process file " + file.getFileName().toString());
+					System.out.println(log.toString() + " Process file " + file.getFileName().toString());
 
 					Path toUpload = acdEncodedPath.resolve(localEncodedPath.relativize(file)).getParent();
 
@@ -84,7 +84,7 @@ public class Uploader {
 					int nbAttempt = 0;
 					while (nbAttempt < 3) {
 						try {
-							System.out.println(log.toString() + "Upload file to " + toUpload.toAbsolutePath().toString() + " attempt " + ++nbAttempt);
+							System.out.println(log.toString() + " Upload file to " + toUpload.toAbsolutePath().toString() + " attempt " + ++nbAttempt);
 							DefaultExecutor executor = new DefaultExecutor();
 							outputStream = new ByteArrayOutputStream();
 							PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
@@ -109,9 +109,9 @@ public class Uploader {
 					if (!dir.equals(localEncodedPath)) {
 						StringBuilder log = new StringBuilder();
 						for (int i = 0; i < dir.getNameCount(); i++) {
-							log.append(" ... ");
+							log.append(" ...");
 						}
-						System.out.println(log.toString() + "Directory " + dir.getFileName().toString() + " processed");
+						System.out.println(log.toString() + " Directory " + dir.getFileName().toString() + " processed");
 						try {
 							Files.delete(dir);
 						} catch (Exception e) {
@@ -125,7 +125,7 @@ public class Uploader {
 				public FileVisitResult visitFileFailed(Path file, IOException e) throws IOException {
 					StringBuilder log = new StringBuilder();
 					for (int i = 0; i < file.getNameCount(); i++) {
-						log.append(" ... ");
+						log.append(" ...");
 					}
 					System.out.println(log.toString() + e.getMessage());
 					return FileVisitResult.CONTINUE;
