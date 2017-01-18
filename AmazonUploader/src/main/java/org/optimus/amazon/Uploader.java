@@ -33,10 +33,14 @@ public class Uploader {
 			Files.walkFileTree(localEncodedPath, new SimpleFileVisitor<Path>() {
 
 				@Override
-				public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
-						throws IOException {
+				public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
 					if (!dir.equals(localEncodedPath) && !StringUtils.startsWith(dir.getFileName().toString(), ".")) {
-						System.out.println("Process directory " + dir);
+						StringBuilder log = new StringBuilder();
+						for (int i = 0; i < dir.getNameCount(); i++) {
+							log.append(" ... ");
+						}
+						System.out.println("Process directory " + log.toString() + dir.getFileName().toString());
+
 						Path toCreate = acdEncodedPath.resolve(localEncodedPath.relativize(dir));
 
 						CommandLine cmdLine = new CommandLine("acd_cli");
@@ -45,15 +49,15 @@ public class Uploader {
 
 						ByteArrayOutputStream outputStream = null;
 						try {
-							System.out.println("Create directory " + toCreate.toAbsolutePath().toString());
+							System.out.println(log.toString() + "Create directory " + toCreate.toAbsolutePath().toString());
 							DefaultExecutor executor = new DefaultExecutor();
 							outputStream = new ByteArrayOutputStream();
 							PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
 							executor.setStreamHandler(streamHandler);
 							executor.execute(cmdLine);
-							System.out.println(outputStream.toString());
+							System.out.println(log.toString() + outputStream.toString());
 						} catch (Exception e) {
-							e.printStackTrace();
+							System.out.println(log.toString() + e.getMessage());
 						} finally {
 							IOUtils.closeQuietly(outputStream);
 						}
@@ -63,7 +67,12 @@ public class Uploader {
 
 				@Override
 				public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-					System.out.println("Process file " + file);
+					StringBuilder log = new StringBuilder();
+					for (int i = 0; i < file.getNameCount(); i++) {
+						log.append(" ... ");
+					}
+					System.out.println(log.toString() + "Process file " + file.getFileName().toString());
+
 					Path toUpload = acdEncodedPath.resolve(localEncodedPath.relativize(file)).getParent();
 
 					CommandLine cmdLine = new CommandLine("acd_cli");
@@ -72,21 +81,24 @@ public class Uploader {
 					cmdLine.addArgument(toUpload.toAbsolutePath().toString());
 
 					ByteArrayOutputStream outputStream = null;
-					try {
-						System.out.println("Upload file to " + toUpload.toAbsolutePath().toString());
-						DefaultExecutor executor = new DefaultExecutor();
-						outputStream = new ByteArrayOutputStream();
-						PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
-						executor.setStreamHandler(streamHandler);
-						long start = Calendar.getInstance().getTimeInMillis();
-						executor.execute(cmdLine);
-						System.out.println(outputStream.toString() + "("
-								+ (Calendar.getInstance().getTimeInMillis() - start) / 1000 + "sec)");
-						Files.delete(file);
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						IOUtils.closeQuietly(outputStream);
+					int nbAttempt = 0;
+					while (nbAttempt < 3) {
+						try {
+							System.out.println(log.toString() + "Upload file to " + toUpload.toAbsolutePath().toString() + " attempt " + ++nbAttempt);
+							DefaultExecutor executor = new DefaultExecutor();
+							outputStream = new ByteArrayOutputStream();
+							PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+							executor.setStreamHandler(streamHandler);
+							long start = Calendar.getInstance().getTimeInMillis();
+							executor.execute(cmdLine);
+							System.out.println(log.toString() + outputStream.toString() + "(" + (Calendar.getInstance().getTimeInMillis() - start) / 1000 + " sec)");
+							Files.delete(file);
+							break;
+						} catch (Exception e) {
+							System.out.println(log.toString() + e.getMessage());
+						} finally {
+							IOUtils.closeQuietly(outputStream);
+						}
 					}
 
 					return FileVisitResult.CONTINUE;
@@ -95,19 +107,27 @@ public class Uploader {
 				@Override
 				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
 					if (!dir.equals(localEncodedPath)) {
-						System.out.println("Directory " + dir + " processed");
+						StringBuilder log = new StringBuilder();
+						for (int i = 0; i < dir.getNameCount(); i++) {
+							log.append(" ... ");
+						}
+						System.out.println(log.toString() + "Directory " + dir.getFileName().toString() + " processed");
 						try {
 							Files.delete(dir);
 						} catch (Exception e) {
-							e.printStackTrace();
+							System.out.println(log.toString() + e.getMessage());
 						}
 					}
 					return FileVisitResult.CONTINUE;
 				}
 
 				@Override
-				public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-					exc.toString();
+				public FileVisitResult visitFileFailed(Path file, IOException e) throws IOException {
+					StringBuilder log = new StringBuilder();
+					for (int i = 0; i < file.getNameCount(); i++) {
+						log.append(" ... ");
+					}
+					System.out.println(log.toString() + e.getMessage());
 					return FileVisitResult.CONTINUE;
 				}
 
