@@ -51,6 +51,7 @@
 							<mainClass>org.optimus.amazon.Uploader</mainClass>
 						</manifest>
 					</archive>
+					<finalName>app</finalName>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
