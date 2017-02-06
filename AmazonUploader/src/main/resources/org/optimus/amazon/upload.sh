@@ -1,1 +1,0 @@
-java -jar AmazonUploader-0.0.1-SNAPSHOT-jar-with-dependencies.jar /home/data/.local-sorted /encoded_media_data
