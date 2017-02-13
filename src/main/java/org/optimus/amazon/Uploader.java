@@ -82,7 +82,7 @@ public class Uploader {
 					int nbAttempt = 0;
 					while (nbAttempt < 3) {
 						try {
-							log(file, "Upload " + toUpload.toAbsolutePath().toString() + " attempt " + ++nbAttempt);
+							log(file, "Upload to " + toUpload.toAbsolutePath().toString() + " attempt " + ++nbAttempt);
 							DefaultExecutor executor = new DefaultExecutor();
 							outputStream = new ByteArrayOutputStream();
 							PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
