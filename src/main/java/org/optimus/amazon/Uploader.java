@@ -80,24 +80,21 @@ public class Uploader {
 
 					ByteArrayOutputStream outputStream = null;
 					int nbAttempt = 0;
-					while (nbAttempt < 3) {
-						try {
-							log(file, "Upload to " + toUpload.toAbsolutePath().toString() + " attempt " + ++nbAttempt);
-							DefaultExecutor executor = new DefaultExecutor();
-							outputStream = new ByteArrayOutputStream();
-							PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
-							executor.setStreamHandler(streamHandler);
-							long start = Calendar.getInstance().getTimeInMillis();
-							executor.execute(cmdLine);
-							log(file, outputStream.toString() + "(" + (Calendar.getInstance().getTimeInMillis() - start) / 1000 + " sec)");
-							log(file, "Delete " + file.getFileName().toString());
-							Files.delete(file);
-							break;
-						} catch (Exception e) {
-							log(file, e.getMessage());
-						} finally {
-							IOUtils.closeQuietly(outputStream);
-						}
+					try {
+						log(file, "Upload to " + toUpload.toAbsolutePath().toString() + " attempt " + ++nbAttempt);
+						DefaultExecutor executor = new DefaultExecutor();
+						outputStream = new ByteArrayOutputStream();
+						PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+						executor.setStreamHandler(streamHandler);
+						long start = Calendar.getInstance().getTimeInMillis();
+						executor.execute(cmdLine);
+						log(file, outputStream.toString() + "(" + (Calendar.getInstance().getTimeInMillis() - start) / 1000 + " sec)");
+						log(file, "Delete " + file.getFileName().toString());
+						Files.delete(file);
+					} catch (Exception e) {
+						log(file, e.getMessage());
+					} finally {
+						IOUtils.closeQuietly(outputStream);
 					}
 
 					return FileVisitResult.CONTINUE;
