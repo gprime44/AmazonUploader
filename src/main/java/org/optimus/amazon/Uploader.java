@@ -79,9 +79,8 @@ public class Uploader {
 					cmdLine.addArgument(toUpload.toAbsolutePath().toString());
 
 					ByteArrayOutputStream outputStream = null;
-					int nbAttempt = 0;
 					try {
-						log(file, "Upload to " + toUpload.toAbsolutePath().toString() + " attempt " + ++nbAttempt);
+						log(file, "Upload to " + toUpload.toAbsolutePath().toString());
 						DefaultExecutor executor = new DefaultExecutor();
 						outputStream = new ByteArrayOutputStream();
 						PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
